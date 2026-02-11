@@ -1,0 +1,66 @@
+Analyzing expense_tracker...                                    
+
+   info - 'value' is deprecated and shouldn't be used. Use initialValue instead. This will set the initial value for the form field. This feature was deprecated after v3.33.0-1.0.pre - lib\screens\edit_expense_dialog.dart:90:17 - deprecated_member_use
+warning - The value of the local variable 'theme' isn't used - lib\screens\edit_profile_screen.dart:71:11 - unused_local_variable
+   info - Statements in an if should be enclosed in a block - lib\screens\expenses_screen.dart:86:13 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\expenses_screen.dart:88:13 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\expenses_screen.dart:92:13 - curly_braces_in_flow_control_structures
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\screens\expenses_screen.dart:125:58 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\screens\home_screen.dart:47:7 - avoid_print
+   info - Don't use 'BuildContext's across async gaps - lib\screens\home_screen.dart:111:9 - use_build_context_synchronously
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\screens\home_screen.dart:125:56 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\screens\home_screen.dart:314:62 - deprecated_member_use
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\screens\home_screen.dart:492:67 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\screens\lib\screens\home_screen.dart:57:7 - avoid_print
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\screens\profile_screen.dart:40:66 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\profile_screen.dart:154:66 - deprecated_member_use
+   info - Statements in an if should be enclosed in a block - lib\screens\reports_screen.dart:64:11 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\reports_screen.dart:102:13 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\reports_screen.dart:104:13 - curly_braces_in_flow_control_structures
+   info - Statements in an if should be enclosed in a block - lib\screens\reports_screen.dart:106:13 - curly_braces_in_flow_control_structures
+   info - 'swapAnimationDuration' is deprecated and shouldn't be used. Please use [duration] instead - lib\screens\reports_screen.dart:278:15 - deprecated_member_use
+   info - 'swapAnimationCurve' is deprecated and shouldn't be used. Please use [curve] instead - lib\screens\reports_screen.dart:279:15 - deprecated_member_use
+warning - The declaration '_summaryCard' isn't referenced - lib\screens\reports_screen.dart:288:10 - unused_element
+   info - 'onBackground' is deprecated and shouldn't be used. Use onSurface instead. This feature was deprecated after v3.18.0-0.1.pre - lib\screens\review_expenses_screen.dart:40:128 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\splash_screen.dart:64:73 - deprecated_member_use
+   info - Unnecessary cascade expression - lib\screens\splash_screen.dart:75:23 - avoid_single_cascade_in_expression_statements
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\screens\splash_screen.dart:101:77 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:28:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:32:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:35:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:38:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:56:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:60:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:63:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:66:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:86:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:89:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:97:9 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:101:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:104:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\ai_service.dart:107:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\auth_service.dart:26:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\auth_service.dart:41:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\auth_service.dart:56:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\auth_service.dart:73:7 - avoid_print
+   info - Don't invoke 'print' in production code - lib\services\auth_service.dart:85:7 - avoid_print
+   info - The file name 'action-tile.dart' isn't a lower_case_with_underscores identifier - lib\widgets\action-tile.dart:1:1 - file_names
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\action-tile.dart:44:52 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\balance_card.dart:34:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\balance_card.dart:47:39 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\balance_card.dart:58:106 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\balance_card.dart:59:72 - deprecated_member_use
+   info - The file name 'custom-card.dart' isn't a lower_case_with_underscores identifier - lib\widgets\custom-card.dart:1:1 - file_names
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\custom-card.dart:35:46 - deprecated_member_use
+   info - The local variable '_navButton' starts with an underscore - lib\widgets\custom_bottom_nav_bar.dart:21:12 - no_leading_underscores_for_local_identifiers
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\custom_bottom_nav_bar.dart:41:67 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\custom_bottom_nav_bar.dart:46:67 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\custom_bottom_nav_bar.dart:61:65 - deprecated_member_use
+   info - The file name 'expense-list-item.dart' isn't a lower_case_with_underscores identifier - lib\widgets\expense-list-item.dart:1:1 - file_names
+   info - The file name 'fade-page-route.dart' isn't a lower_case_with_underscores identifier - lib\widgets\fade-page-route.dart:1:1 - file_names
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\glass_card.dart:23:26 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\glass_card.dart:26:65 - deprecated_member_use
+   info - 'withOpacity' is deprecated and shouldn't be used. Use .withValues() to avoid precision loss - lib\widgets\transaction_tile.dart:48:39 - deprecated_member_use
+   info - Don't invoke 'print' in production code - lib\widgets\voice_listening_sheet.dart:31:7 - avoid_print
+   info - Use a 'SizedBox' to add whitespace to a layout - lib\widgets\voice_listening_sheet.dart:93:11 - sized_box_for_whitespace
+
