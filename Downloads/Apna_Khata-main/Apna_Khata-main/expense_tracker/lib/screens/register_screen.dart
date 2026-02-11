@@ -26,8 +26,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
           _error = 'Registration failed. The email might already be in use.';
           _isLoading = false;
         });
+      } else if (user != null && mounted) {
+        // Pop the RegisterScreen so AuthGate can show the MainAppShell
+        Navigator.of(context).pop();
       }
-      // On success, AuthGate handles navigation.
     }
   }
 
@@ -39,8 +41,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _error = 'Google Sign-In failed. Please try again.';
         _isLoading = false;
       });
+    } else if (user != null && mounted) {
+      Navigator.of(context).pop();
     }
-    // On success, AuthGate handles navigation.
   }
 
   @override

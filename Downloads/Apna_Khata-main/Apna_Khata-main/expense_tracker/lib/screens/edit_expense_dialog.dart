@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 class EditExpenseDialog extends StatefulWidget {
   final Map<String, dynamic> initialData;
@@ -13,18 +14,24 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> {
   late TextEditingController _itemController;
   late TextEditingController _amountController;
   late String _selectedCategory;
+  late DateTime _selectedDate;
 
   final _formKey = GlobalKey<FormState>();
-  // This is the master list of categories your UI supports.
+  // Synchronized with backend app.py
   final List<String> _categories = [
-    'Food',
+    'Food & Dining',
+    'Grocery',
+    'Housing & Rent',
     'Transport',
-    'Shopping',
-    'Utilities',
+    'Travel',
+    'Shopping & Lifestyle',
     'Health',
-    'Entertainment',
-    'Education',
     'Personal Care',
+    'Education',
+    'Investments',
+    'Utilities & Bills',
+    'Pets',
+    'Entertainment',
     'Gifts & Donations',
     'Other',
   ];
@@ -37,18 +44,31 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> {
       text: widget.initialData['amount'].toString(),
     );
 
-    // --- THIS IS THE FIX ---
+    // Initialize Date
+    if (widget.initialData['date'] != null) {
+      try {
+        // Try parsing YYYY-MM-DD
+        _selectedDate = DateTime.parse(widget.initialData['date']);
+      } catch (e) {
+        // Fallback to now if parse fails
+        _selectedDate = DateTime.now();
+      }
+    } else {
+      _selectedDate = DateTime.now();
+    }
+
     String initialCategory = widget.initialData['category'];
     // Check if the category from the AI exists in our list.
     if (_categories.contains(initialCategory)) {
-      // If it exists, use it.
       _selectedCategory = initialCategory;
     } else {
-      // If it DOES NOT exist (e.g., "Food & Dining"), default to "Other".
-      // This prevents the app from crashing.
-      _selectedCategory = 'Other';
+      // Try to match partial (e.g. "Food" -> "Food & Dining")
+      final match = _categories.firstWhere(
+        (c) => c.startsWith(initialCategory) || initialCategory.startsWith(c),
+        orElse: () => 'Other',
+      );
+      _selectedCategory = match;
     }
-    // --- END OF FIX ---
   }
 
   @override
@@ -64,8 +84,23 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> {
         'item': _itemController.text,
         'amount': double.tryParse(_amountController.text) ?? 0.0,
         'category': _selectedCategory,
+        'date': DateFormat(
+          'yyyy-MM-dd',
+        ).format(_selectedDate), // Return date only
       };
       Navigator.of(context).pop(updatedData);
+    }
+  }
+
+  Future<void> _pickDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (picked != null) {
+      setState(() => _selectedDate = picked);
     }
   }
 
@@ -104,6 +139,18 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> {
                 },
               ),
               const SizedBox(height: 12),
+              // Date Picker Field
+              InkWell(
+                onTap: _pickDate,
+                child: InputDecorator(
+                  decoration: const InputDecoration(
+                    labelText: 'Date',
+                    suffixIcon: Icon(Icons.calendar_today),
+                  ),
+                  child: Text(DateFormat('MMM dd, yyyy').format(_selectedDate)),
+                ),
+              ),
+              const SizedBox(height: 12),
               DropdownButtonFormField<String>(
                 initialValue: _selectedCategory,
                 decoration: const InputDecoration(labelText: 'Category'),
@@ -112,7 +159,9 @@ class _EditExpenseDialogState extends State<EditExpenseDialog> {
                         .map(
                           (String category) => DropdownMenuItem<String>(
                             value: category,
-                            child: Text(category),
+                            child: Text(
+                              category,
+                            ), // Allow customization if needed
                           ),
                         )
                         .toList(),

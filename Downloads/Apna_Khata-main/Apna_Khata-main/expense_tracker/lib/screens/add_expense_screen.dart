@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:expense_tracker/screens/edit_expense_dialog.dart';
 import 'package:expense_tracker/services/ai_service.dart';
 import 'package:expense_tracker/services/firestore_service.dart';
@@ -83,10 +84,21 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
   Future<void> _saveConfirmedExpense() async {
     if (_processedData == null) return;
     setState(() => _isProcessing = true);
+
+    DateTime? expenseDate;
+    if (_processedData!['date'] != null) {
+      try {
+        expenseDate = DateTime.parse(_processedData!['date']);
+      } catch (e) {
+        debugPrint('Error parsing date: $e');
+      }
+    }
+
     await _firestoreService.addExpense(
       _processedData!['item'],
       _processedData!['amount'],
       _processedData!['category'],
+      date: expenseDate,
     );
     if (mounted) {
       Navigator.of(context).pop();
@@ -187,6 +199,11 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
                       'Category',
                       _processedData!['category'].toString(),
                     ),
+                    _buildResultRow(
+                      context,
+                      'Date',
+                      _formatDate(_processedData!['date']),
+                    ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
@@ -231,5 +248,15 @@ class _AddExpenseScreenState extends State<AddExpenseScreen> {
         ],
       ),
     );
+  }
+
+  String _formatDate(String? dateStr) {
+    if (dateStr == null) return 'Today';
+    try {
+      final date = DateTime.parse(dateStr);
+      return DateFormat('MMM dd, yyyy').format(date);
+    } catch (e) {
+      return dateStr;
+    }
   }
 }

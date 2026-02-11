@@ -11,7 +11,9 @@ import 'package:expense_tracker/services/firestore_service.dart';
 import 'package:expense_tracker/utils/app_theme.dart';
 import 'package:expense_tracker/widgets/balance_card.dart';
 import 'package:expense_tracker/widgets/fade_page_route.dart';
+import 'package:expense_tracker/widgets/insights_widget.dart';
 import 'package:expense_tracker/widgets/transaction_tile.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -422,6 +424,68 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // Dialog for setting monthly budget
+  Future<void> _showSetBudgetDialog(
+    BuildContext context,
+    double currentBudget,
+  ) async {
+    final TextEditingController controller = TextEditingController(
+      text: currentBudget > 0 ? currentBudget.toStringAsFixed(0) : '',
+    );
+
+    return showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Set Monthly Budget'),
+          content: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              labelText: 'Budget Amount (₹)',
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            ElevatedButton(
+              child: const Text('Save'),
+              onPressed: () async {
+                final double? newBudget = double.tryParse(controller.text);
+                if (newBudget != null) {
+                  final user = _firestoreService.currentUser;
+                  if (user != null) {
+                    final profile =
+                        await _firestoreService.getUserProfile().first;
+                    // We need a way to update just the budget.
+                    // Since updateUserProfile takes a full object, we'll fetch, update, and save.
+                    // A better way in FirestoreService would be specific update methods, but for now:
+                    final updatedProfile = UserProfile(
+                      uid: profile.uid,
+                      email: profile.email,
+                      displayName: profile.displayName,
+                      phoneNumber: profile.phoneNumber,
+                      dateOfBirth: profile.dateOfBirth,
+                      photoURL: profile.photoURL,
+                      monthlyBudget: newBudget,
+                    );
+                    await _firestoreService.updateUserProfile(updatedProfile);
+                  }
+                }
+                if (dialogContext.mounted) {
+                  Navigator.of(dialogContext).pop();
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -434,145 +498,223 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         child: SafeArea(
-          child: StreamBuilder<List<Expense>>(
-            stream: _firestoreService.getExpensesStream(),
-            builder: (context, snapshot) {
-              final expenses = snapshot.data ?? [];
-              final monthly = _monthlyTotal(expenses);
-              final lastMonth = _lastMonthTotal(expenses);
-              final delta = monthly - lastMonth;
-              final latest = expenses.take(3).toList();
+          child: StreamBuilder<UserProfile>(
+            stream: _firestoreService.getUserProfile(),
+            builder: (context, profileSnapshot) {
+              final userProfile = profileSnapshot.data;
+              final monthlyBudget = userProfile?.monthlyBudget ?? 0.0;
 
-              return SingleChildScrollView(
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    _header(context),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(24),
-                        boxShadow:
-                            Theme.of(
-                              context,
-                            ).extension<AppShadows>()!.cardShadow,
-                        border: Border.all(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.onSurface.withValues(alpha: 0.06),
-                        ),
-                      ),
-                      child: Column(
-                        children: [
-                          BalanceCard(
-                            currency: 'INR',
-                            amount: monthly,
-                            subtitle: 'This month',
-                            delta: delta,
-                          ),
-                          const SizedBox(height: 12),
-                          const Divider(height: 1),
-                          const SizedBox(height: 12),
-                          _actionsRow(context),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 18),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              return StreamBuilder<List<Expense>>(
+                stream: _firestoreService.getExpensesStream(),
+                builder: (context, snapshot) {
+                  final expenses = snapshot.data ?? [];
+                  final monthly = _monthlyTotal(expenses);
+                  final lastMonth = _lastMonthTotal(expenses);
+                  final delta = monthly - lastMonth;
+                  final latest = expenses.take(3).toList();
+
+                  return SingleChildScrollView(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Text(
-                          'Latest Transactions',
-                          style: Theme.of(context).textTheme.headlineMedium,
-                        ),
-                        TextButton(
-                          onPressed:
-                              () => Navigator.of(context).push(
-                                FadePageRoute(page: const ExpensesScreen()),
-                              ),
-                          style: TextButton.styleFrom(
-                            foregroundColor:
-                                Theme.of(context).colorScheme.primary,
-                          ),
-                          child: const Text('See All'),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    if (snapshot.connectionState == ConnectionState.waiting)
-                      const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: CircularProgressIndicator(),
-                        ),
-                      )
-                    else if (latest.isEmpty)
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'No recent transactions.',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      )
-                    else
-                      Column(
-                        children: List.generate(
-                          latest.length,
-                          (i) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 6),
-                            child: TransactionTile(
-                              expense: latest[i],
-                              index: i,
+                        _header(context),
+                        const SizedBox(height: 16),
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow:
+                                Theme.of(
+                                  context,
+                                ).extension<AppShadows>()!.cardShadow,
+                            border: Border.all(
+                              color: Theme.of(
+                                context,
+                              ).colorScheme.onSurface.withValues(alpha: 0.06),
                             ),
                           ),
-                        ),
-                      ),
-                    const SizedBox(height: 18),
-                    Text(
-                      'Add Expense By',
-                      style: Theme.of(context).textTheme.headlineMedium,
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        // --- The Voice Entry button now calls the correct, robust handler ---
-                        _inputMethodCard(
-                          icon: Icons.mic,
-                          label: 'Voice Entry',
-                          onTap: _handleVoiceInput,
-                        ),
-                        // ------------------------------------
-                        const SizedBox(width: 12),
-                        _inputMethodCard(
-                          icon: Icons.picture_as_pdf_outlined,
-                          label: 'Import PDF',
-                          onTap: _importPdf,
-                        ),
-                        const SizedBox(width: 12),
-                        _inputMethodCard(
-                          icon: Icons.post_add_outlined,
-                          label: 'Add Manually',
-                          onTap:
-                              () => Navigator.of(context).push(
-                                FadePageRoute(page: const AddExpenseScreen()),
+                          child: Column(
+                            children: [
+                              BalanceCard(
+                                currency: 'INR',
+                                amount: monthly,
+                                subtitle: 'This month',
+                                delta: delta,
                               ),
+                              const SizedBox(height: 12),
+                              const Divider(height: 1),
+                              const SizedBox(height: 12),
+                              _actionsRow(context),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Budget / Insights Section
+                        if (monthlyBudget > 0)
+                          GestureDetector(
+                            onTap:
+                                () => _showSetBudgetDialog(
+                                  context,
+                                  monthlyBudget,
+                                ),
+                            child: InsightsWidget(
+                              expenses: expenses,
+                              income: monthlyBudget,
+                            ),
+                          )
+                        else
+                          Card(
+                            elevation: 4,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: InkWell(
+                              onTap: () => _showSetBudgetDialog(context, 0),
+                              borderRadius: BorderRadius.circular(16),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Row(
+                                  children: [
+                                    const Icon(
+                                      Icons.account_balance_wallet,
+                                      size: 40,
+                                      color: Colors.blue,
+                                    ),
+                                    const SizedBox(width: 16),
+                                    const Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            "Set Monthly Budget",
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                          Text(
+                                            "Tap to enable AI insights & alerts",
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    const Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 16,
+                                      color: Colors.grey,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+
+                        const SizedBox(height: 18),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Latest Transactions',
+                              style: Theme.of(context).textTheme.headlineMedium,
+                            ),
+                            TextButton(
+                              onPressed:
+                                  () => Navigator.of(context).push(
+                                    FadePageRoute(page: const ExpensesScreen()),
+                                  ),
+                              style: TextButton.styleFrom(
+                                foregroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                              ),
+                              child: const Text('See All'),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 6),
+                        if (snapshot.connectionState == ConnectionState.waiting)
+                          const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(),
+                            ),
+                          )
+                        else if (latest.isEmpty)
+                          Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              'No recent transactions.',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          )
+                        else
+                          Column(
+                            children: List.generate(
+                              latest.length,
+                              (i) => Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 6,
+                                ),
+                                child: TransactionTile(
+                                  expense: latest[i],
+                                  index: i,
+                                ),
+                              ),
+                            ),
+                          ),
+                        const SizedBox(height: 18),
+                        Text(
+                          'Add Expense By',
+                          style: Theme.of(context).textTheme.headlineMedium,
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          children: [
+                            // --- The Voice Entry button now calls the correct, robust handler ---
+                            _inputMethodCard(
+                              icon: Icons.mic,
+                              label: 'Voice Entry',
+                              onTap: _handleVoiceInput,
+                            ),
+                            // ------------------------------------
+                            const SizedBox(width: 12),
+                            _inputMethodCard(
+                              icon: Icons.picture_as_pdf_outlined,
+                              label: 'Import PDF',
+                              onTap: _importPdf,
+                            ),
+                            const SizedBox(width: 12),
+                            _inputMethodCard(
+                              icon: Icons.post_add_outlined,
+                              label: 'Add Manually',
+                              onTap:
+                                  () => Navigator.of(context).push(
+                                    FadePageRoute(
+                                      page: const AddExpenseScreen(),
+                                    ),
+                                  ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: _scanReceipt,
+                            icon: const Icon(Icons.receipt_long),
+                            label: const Text('Scan Receipt'),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: _scanReceipt,
-                        icon: const Icon(Icons.receipt_long),
-                        label: const Text('Scan Receipt'),
-                      ),
-                    ),
-                  ],
-                ),
+                  );
+                },
               );
             },
           ),

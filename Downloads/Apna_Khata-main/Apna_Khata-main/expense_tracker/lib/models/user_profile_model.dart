@@ -7,6 +7,7 @@ class UserProfile {
   final String? phoneNumber;
   final Timestamp? dateOfBirth;
   final String? photoURL;
+  final double? monthlyBudget; // New field for budget
 
   UserProfile({
     required this.uid,
@@ -15,9 +16,12 @@ class UserProfile {
     this.phoneNumber,
     this.dateOfBirth,
     this.photoURL,
+    this.monthlyBudget,
   });
 
-  factory UserProfile.fromFirestore(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+  factory UserProfile.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+  ) {
     final data = snapshot.data();
     // A null check to prevent crashes if the document doesn't exist or is empty
     if (data == null) {
@@ -30,6 +34,7 @@ class UserProfile {
       phoneNumber: data['phoneNumber'],
       dateOfBirth: data['dateOfBirth'],
       photoURL: data['photoURL'],
+      monthlyBudget: (data['monthlyBudget'] ?? 0.0).toDouble(),
     );
   }
 
@@ -40,6 +45,7 @@ class UserProfile {
       'phoneNumber': phoneNumber,
       'dateOfBirth': dateOfBirth,
       'photoURL': photoURL,
+      'monthlyBudget': monthlyBudget,
     };
   }
 }

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
@@ -5,6 +6,7 @@ import 'package:expense_tracker/models/expense_model.dart';
 import 'package:expense_tracker/services/firestore_service.dart';
 import 'package:expense_tracker/utils/app_theme.dart';
 import 'package:expense_tracker/widgets/custom_card.dart';
+import 'package:path_provider/path_provider.dart';
 
 // Enum to manage the state of the time filter
 enum TimeFilter { day, week, month }
@@ -53,7 +55,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
     TimeFilter filter,
   ) {
     final Map<String, double> chartData = {};
+
     if (filter == TimeFilter.week) {
+      // Last 7 days trend
       for (int i = 0; i < 7; i++) {
         final day = DateTime.now().subtract(Duration(days: 6 - i));
         chartData[DateFormat.E().format(day)] = 0.0;
@@ -64,7 +68,23 @@ class _ReportsScreenState extends State<ReportsScreen> {
           chartData[dayKey] = chartData[dayKey]! + e.amount;
         }
       }
+    } else if (filter == TimeFilter.month) {
+      // Days of month trend (1-30/31)
+      // Initialize for all days in current month or up to current day?
+      // Usually showing all days in month is good context.
+      final now = DateTime.now();
+      final daysInMonth = DateUtils.getDaysInMonth(now.year, now.month);
+      for (int i = 1; i <= daysInMonth; i++) {
+        chartData[i.toString()] = 0.0;
+      }
+      for (var e in filteredExpenses) {
+        final dayKey = e.timestamp.toDate().day.toString();
+        if (chartData.containsKey(dayKey)) {
+          chartData[dayKey] = chartData[dayKey]! + e.amount;
+        }
+      }
     } else {
+      // Day view: Category breakdown
       for (var e in filteredExpenses) {
         chartData[e.category] = (chartData[e.category] ?? 0) + e.amount;
       }
@@ -90,12 +110,68 @@ class _ReportsScreenState extends State<ReportsScreen> {
     return sortedItems.take(4).toList();
   }
 
+  // --- Helper to get consistent color for a category ---
+  Color _getCategoryColor(String category, AppTokens tokens) {
+    final int hash = category.codeUnits.fold(0, (prev, elem) => prev + elem);
+    return tokens.chartPalette[hash % tokens.chartPalette.length];
+  }
+
+  Future<void> _downloadReport() async {
+    try {
+      final expenses = await _firestoreService.getExpensesStream().first;
+      final filteredExpenses = _filterExpenses(expenses, _selectedFilter);
+
+      final sb = StringBuffer();
+      sb.writeln('Date,Item,Category,Amount');
+      for (final expense in filteredExpenses) {
+        final date = DateFormat(
+          'yyyy-MM-dd',
+        ).format(expense.timestamp.toDate());
+        // Simple CSV escaping: replace " with "" and wrap in " if needed
+        final item = expense.item.replaceAll('"', '""');
+        final category = expense.category.replaceAll('"', '""');
+        sb.writeln('$date,"$item","$category",${expense.amount}');
+      }
+
+      final directory = await getApplicationDocumentsDirectory();
+      final dateStr = DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
+      final path =
+          '${directory.path}/report_${_selectedFilter.name}_$dateStr.csv';
+      final file = File(path);
+      await file.writeAsString(sb.toString());
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Report saved to $path'),
+            action: SnackBarAction(label: 'OK', onPressed: () {}),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error generating report: $e')));
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final appColors = theme.extension<AppTokens>()!;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Financial Analysis')),
+      appBar: AppBar(
+        title: const Text('Financial Analysis'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.download),
+            onPressed: () => _downloadReport(),
+          ),
+        ],
+      ),
       body: StreamBuilder<List<Expense>>(
         stream: _firestoreService.getExpensesStream(),
         builder: (context, snapshot) {
@@ -120,7 +196,6 @@ class _ReportsScreenState extends State<ReportsScreen> {
             _selectedFilter,
           );
 
-          // --- MODIFIED: Removed avgSpend and highestSpend ---
           final totalSpend = filteredExpenses.fold<double>(
             0,
             (sum, e) => sum + e.amount,
@@ -137,12 +212,21 @@ class _ReportsScreenState extends State<ReportsScreen> {
             children: [
               _buildFilterButtons(theme),
               const SizedBox(height: 24),
-              _buildMainChartCard(theme, chartData, totalSpend),
+              _buildMainChartCard(
+                theme,
+                chartData,
+                totalSpend,
+                _selectedFilter,
+              ),
               const SizedBox(height: 24),
-              // --- MODIFIED: Call the updated summary card builder ---
               _buildSummaryCard(theme, 'Total Spend', totalSpend),
               const SizedBox(height: 24),
-              _buildTopCategoriesCard(theme, topCategories, totalSpend),
+              _buildTopCategoriesCard(
+                theme,
+                topCategories,
+                totalSpend,
+                appColors,
+              ),
             ],
           );
         },
@@ -200,8 +284,10 @@ class _ReportsScreenState extends State<ReportsScreen> {
     ThemeData theme,
     Map<String, double> chartData,
     double total,
+    TimeFilter filter,
   ) {
     final appColors = theme.extension<AppTokens>()!;
+
     return CustomCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -232,7 +318,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                     (chartData.values.isEmpty
                         ? 0
                         : chartData.values.reduce((a, b) => a > b ? a : b)) *
-                    1.3,
+                    1.2, // Reduced buffer slightly
                 titlesData: FlTitlesData(
                   rightTitles: const AxisTitles(
                     sideTitles: SideTitles(showTitles: false),
@@ -248,11 +334,24 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       showTitles: true,
                       reservedSize: 28,
                       getTitlesWidget: (value, meta) {
-                        final label = chartData.keys.elementAt(value.toInt());
+                        if (value < 0 || value >= chartData.length) {
+                          return const SizedBox();
+                        }
+                        final index = value.toInt();
+                        final label = chartData.keys.elementAt(index);
+
+                        // For Month view specifically, show Fewer labels if crowded
+                        if (filter == TimeFilter.month) {
+                          // Show every 5th label
+                          if (index % 5 != 0 && index != chartData.length - 1) {
+                            return const SizedBox();
+                          }
+                        }
+
                         return Padding(
                           padding: const EdgeInsets.only(top: 8.0),
                           child: Text(
-                            label.substring(0, 3),
+                            label.length > 3 ? label.substring(0, 3) : label,
                             style: theme.textTheme.bodySmall,
                           ),
                         );
@@ -263,17 +362,28 @@ class _ReportsScreenState extends State<ReportsScreen> {
                 borderData: FlBorderData(show: false),
                 gridData: const FlGridData(show: false),
                 barGroups: List.generate(chartData.length, (i) {
-                  final entry = chartData.entries.elementAt(i);
-                  final color =
-                      appColors.chartPalette[i % appColors.chartPalette.length];
+                  final key = chartData.keys.elementAt(i);
+                  Color barColor;
+
+                  if (filter == TimeFilter.day) {
+                    // Category colors
+                    barColor = _getCategoryColor(key, appColors);
+                  } else {
+                    // Trend colors (single color or gradient)
+                    barColor = theme.colorScheme.primary;
+                  }
+
                   return BarChartGroupData(
                     x: i,
                     barRods: [
                       BarChartRodData(
-                        toY: entry.value,
-                        color: color,
-                        width: 20,
-                        borderRadius: BorderRadius.circular(6),
+                        toY: chartData[key]!,
+                        color: barColor,
+                        width:
+                            filter == TimeFilter.month
+                                ? 6
+                                : 16, // Thinner bars for month
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ],
                   );
@@ -288,41 +398,74 @@ class _ReportsScreenState extends State<ReportsScreen> {
     );
   }
 
-  // --- MODIFIED: This widget is now standalone ---
-
   Widget _buildTopCategoriesCard(
     ThemeData theme,
     List<MapEntry<String, double>> topCategories,
     double total,
+    AppTokens appColors,
   ) {
-    final appColors = theme.extension<AppTokens>()!;
+    // If no data, show a list. If data exists, show Pie Chart.
+    if (topCategories.isEmpty || total == 0) {
+      return const SizedBox.shrink();
+    }
+
     return CustomCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Top Categories', style: theme.textTheme.titleLarge),
-          const SizedBox(height: 12),
+          Text('Top Categories Breakdown', style: theme.textTheme.titleLarge),
+          const SizedBox(height: 24),
+          SizedBox(
+            height: 200,
+            child: PieChart(
+              PieChartData(
+                sectionsSpace: 2,
+                centerSpaceRadius: 40,
+                sections: List.generate(topCategories.length, (i) {
+                  final category = topCategories[i];
+                  final percentage = (category.value / total) * 100;
+                  final color = _getCategoryColor(category.key, appColors);
+
+                  return PieChartSectionData(
+                    color: color,
+                    value: percentage,
+                    title: '${percentage.toStringAsFixed(0)}%',
+                    radius: 50,
+                    titleStyle: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  );
+                }),
+              ),
+            ),
+          ),
+          const SizedBox(height: 24),
+          // Legend
           ...List.generate(topCategories.length, (i) {
             final category = topCategories[i];
-            final percentage = total > 0 ? (category.value / total) * 100 : 0;
-            final color =
-                appColors.chartPalette[i % appColors.chartPalette.length];
+            final percentage = (category.value / total) * 100;
+            final color = _getCategoryColor(category.key, appColors);
+
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              padding: const EdgeInsets.symmetric(vertical: 4.0),
               child: Row(
                 children: [
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: 12,
+                    height: 12,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: color.withValues(alpha: 0.15),
+                      color: color,
                     ),
-                    child: Icon(Icons.shopping_bag_outlined, color: color),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: Text(category.key, style: theme.textTheme.bodyLarge),
+                    child: Text(
+                      category.key,
+                      style: theme.textTheme.bodyMedium,
+                    ),
                   ),
                   Text(
                     NumberFormat.currency(
@@ -330,7 +473,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
                       symbol: '₹',
                       decimalDigits: 0,
                     ).format(category.value),
-                    style: theme.textTheme.bodyLarge?.copyWith(
+                    style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -44,18 +44,23 @@ except Exception as e:
 
 # --- 3. KEYWORD DICTIONARY & HELPER FUNCTIONS ---
 
+# --- 3. KEYWORD DICTIONARY & HELPER FUNCTIONS ---
+
 CATEGORY_KEYWORDS = {
-    'Food & Dining': ['biryani', 'pizza', 'burger', 'sandwich', 'pasta', 'noodles', 'momo', 'thali', 'biriyani', 'dosa', 'idli', 'pav bhaji', 'maggi', 'roll', 'shawarma', 'wrap', 'ice cream', 'cake', 'pastry', 'dessert', 'coffee', 'tea', 'juice', 'smoothie', 'milkshake', 'biryani house', 'barbecue', 'kebab', 'tikka', 'restaurant', 'cafe', 'canteen', 'dining', 'buffet', 'meal', 'zomato', 'swiggy', 'dominos', 'pizza hut', "domino's", "mcdonald's", 'mcdonald', 'kfc', 'subway', 'burger king', 'starbucks', 'barista', '99 pancakes', 'chicken tandoori', 'hocco','apple', 'bikanervala', 'haldiram', 'cafe coffee day', 'baskin robbins'],
-    'Grocery': ['rice', 'wheat', 'dal', 'pulses', 'sugar', 'salt', 'milk', 'bread', 'butter', 'oil', 'tea powder', 'coffee powder', 'vegetables', 'fruits', 'tomato', 'potato', 'onion', 'cabbage', 'spinach', 'coriander', 'lemon', 'masala', 'atta', 'besan', 'poha', 'suji', 'jaggery', 'eggs', 'meat', 'fish', 'chicken', 'mutton', 'prawns', 'spices', 'detergent', 'soap', 'toothpaste', 'grocery', 'bigbasket', 'dmart', 'd mart', 'reliance fresh', 'more supermarket', "nature's basket", 'spencer’s', 'jiomart'],
-    'Entertainment': ['movie', 'netflix', 'spotify', 'concert', 'bookmyshow', 'hotstar', 'prime video', 'sports match', 'stadium', 'theatre', 'cricket', 'football', 'ipl', 'ticket show'],
-    'Transport': ['taxi', 'cab', 'auto', 'bus', 'train', 'flight', 'airline', 'airfare', 'metro', 'tram', 'ferry', 'fuel', 'petrol', 'diesel', 'cng', 'parking', 'toll', 'ticket', 'pass', 'travel card', 'ola', 'uber', 'rapido', 'blablacar', 'redbus', 'irctc'],
-    'Shopping & Lifestyle': ['shirt', 'jeans', 't-shirt', 'tshirt', 'trousers', 'kurta', 'saree', 'dress', 'shoes', 'sandals', 'chappal', 'watch', 'wallet', 'handbag', 'purse', 'belt', 'accessories', 'jacket', 'coat', 'sweater', 'hoodie', 'spectacles', 'sunglasses', 'electronics', 'phone', 'laptop', 'charger', 'earphones', 'headphones', 'camera', 'mall', 'boutique', 'apparel', 'amazon', 'flipkart', 'myntra', 'ajio', 'meesho', 'snapdeal', 'shopclues', 'tatacliq', 'h&m', 'zara', 'nike', 'adidas', 'puma', 'reebok', 'lifestyle'],
-    'Healthcare & Medicine': ['doctor', 'hospital', 'clinic', 'pharmacy', 'chemist', 'medicine', 'injection', 'vaccine', 'blood test', 'sugar test', 'x-ray', 'scan', 'ct scan', 'mri', 'consultation', 'surgery', 'therapy', 'physiotherapy', 'dentist', 'dental', 'ayurvedic', 'homeopathy', 'optician', 'spectacles', 'hearing aid', 'apollo pharmacy', 'medplus', 'pharmeasy', '1mg', 'netmeds', 'practo'],
-    'Personal Care & Grooming': ['salon','spa', 'haircut', 'hair wash', 'shaving', 'trimming', 'beard', 'hair color', 'facial', 'manicure', 'pedicure', 'beauty', 'makeup', 'wax', 'threading', 'perfume', 'deodorant','prostitute','lotion', 'shampoo', 'conditioner', 'body wash', 'soap', 'comb', 'mirror', 'towel', 'grooming kit', 'nykaa', 'purplle', 'wow skin', 'beardo', 'mcaffeine', 'urban company', 'jawed habib'],
-    'Education': ['school fees', 'tuition', 'college fees', 'udemy', 'coursera', 'online course', 'textbooks', 'exam fee'],
-    'Utilities & Bills': ['electricity bill', 'water bill', 'gas bill', 'broadband', 'wifi', 'internet', 'cable', 'dth', 'recharge', 'mobile bill', 'postpaid', 'prepaid', 'landline', 'rent', 'emi', 'loan', 'insurance', 'subscription', 'youtube premium'],
-    'Gifts & Donations': ['gift', 'charity', 'donation', 'present'],
-    'Others': ['stationery', 'pen', 'pencil', 'notebook', 'printing', 'photocopy', 'laundry', 'tailoring', 'repair', 'maintenance', 'pet food', 'toy', 'game', 'miscellaneous']
+    'Food & Dining': ['biryani', 'pizza', 'burger', 'sandwich', 'pasta', 'noodles', 'momo', 'thali', 'biriyani', 'dosa', 'idli', 'pav bhaji', 'maggi', 'roll', 'shawarma', 'wrap', 'ice cream', 'cake', 'pastry', 'dessert', 'coffee', 'tea', 'juice', 'smoothie', 'milkshake', 'biryani house', 'barbecue', 'kebab', 'tikka', 'restaurant', 'cafe', 'canteen', 'dining', 'buffet', 'meal', 'zomato', 'swiggy', 'dominos', 'pizza hut', "domino's", "mcdonald's", 'mcdonald', 'kfc', 'subway', 'burger king', 'starbucks', 'barista', '99 pancakes', 'chicken tandoori', 'hocco','apple', 'bikanervala', 'haldiram', 'cafe coffee day', 'baskin robbins', 'food'],
+    'Grocery': ['rice', 'wheat', 'dal', 'pulses', 'sugar', 'salt', 'milk', 'bread', 'butter', 'oil', 'tea powder', 'coffee powder', 'vegetables', 'fruits', 'tomato', 'potato', 'onion', 'cabbage', 'spinach', 'coriander', 'lemon', 'masala', 'atta', 'besan', 'poha', 'suji', 'jaggery', 'eggs', 'meat', 'fish', 'chicken', 'mutton', 'prawns', 'spices', 'detergent', 'soap', 'toothpaste', 'grocery', 'bigbasket', 'dmart', 'd mart', 'reliance fresh', 'more supermarket', "nature's basket", 'spencer’s', 'jiomart', 'kirana', 'store'],
+    'Housing & Rent': ['rent', 'maintenance', 'electricity bill', 'water bill', 'gas bill', 'broadband', 'wifi', 'internet', 'cable', 'dth', 'landline', 'house help', 'maid', 'cook', 'sweeper', 'garbage', 'property tax', 'repairs', 'plumber', 'electrician', 'carpenter'],
+    'Transport': ['taxi', 'cab', 'auto', 'bus', 'train', 'metro', 'tram', 'ferry', 'fuel', 'petrol', 'diesel', 'cng', 'parking', 'toll', 'ticket', 'pass', 'travel card', 'ola', 'uber', 'rapido', 'blablacar', 'redbus', 'irctc', 'transport'],
+    'Travel': ['flight', 'airline', 'airfare', 'hotel', 'resort', 'stay', 'booking', 'trip', 'tour', 'vacation', 'visa', 'passport', 'makemytrip', 'goibibo', 'cleartrip', 'airbnb', 'oyo', 'luggage'],
+    'Shopping': ['shirt', 'jeans', 't-shirt', 'tshirt', 'trousers', 'kurta', 'saree', 'dress', 'shoes', 'sandals', 'chappal', 'watch', 'wallet', 'handbag', 'purse', 'belt', 'accessories', 'jacket', 'coat', 'sweater', 'hoodie', 'spectacles', 'sunglasses', 'electronics', 'phone', 'laptop', 'charger', 'earphones', 'headphones', 'camera', 'mall', 'boutique', 'apparel', 'amazon', 'flipkart', 'myntra', 'ajio', 'meesho', 'snapdeal', 'shopclues', 'tatacliq', 'h&m', 'zara', 'nike', 'adidas', 'puma', 'reebok', 'lifestyle', 'shopping', 'clothes', 'fabric', 'bag', 'backpack'],
+    'Health': ['doctor', 'hospital', 'clinic', 'pharmacy', 'chemist', 'medicine', 'injection', 'vaccine', 'blood test', 'sugar test', 'x-ray', 'scan', 'ct scan', 'mri', 'consultation', 'surgery', 'therapy', 'physiotherapy', 'dentist', 'dental', 'ayurvedic', 'homeopathy', 'optician', 'hearing aid', 'apollo pharmacy', 'medplus', 'pharmeasy', '1mg', 'netmeds', 'practo', 'medical'],
+    'Personal Care': ['salon','spa', 'haircut', 'hair wash', 'shaving', 'trimming', 'beard', 'hair color', 'facial', 'manicure', 'pedicure', 'beauty', 'makeup', 'wax', 'threading', 'perfume', 'deodorant', 'lotion', 'shampoo', 'conditioner', 'body wash', 'soap', 'comb', 'mirror', 'towel', 'grooming kit', 'nykaa', 'purplle', 'wow skin', 'beardo', 'mcaffeine', 'urban company', 'jawed habib'],
+    'Education': ['school fees', 'tuition', 'college fees', 'udemy', 'coursera', 'online course', 'textbooks', 'exam fee', 'books', 'stationery', 'pen', 'pencil', 'notebook', 'printing', 'photocopy', 'school bag', 'uniform', 'course'],
+    'Investments': ['sip', 'mutual fund', 'stocks', 'shares', 'equity', 'trading', 'demat', 'zerodha', 'groww', 'upstox', 'fixed deposit', 'recurring deposit', 'gold', 'silver', 'lic', 'insurance premium', 'ppf', 'epf', 'nps'],
+    'Pets': ['pet food', 'dog food', 'cat food', 'vet', 'veterinary', 'vaccination', 'pedigree', 'whiskas', 'royal canin', 'drools'],
+    'Entertainment': ['movie', 'netflix', 'spotify', 'concert', 'bookmyshow', 'hotstar', 'prime video', 'sports match', 'stadium', 'theatre', 'cricket', 'football', 'ipl', 'ticket show', 'game', 'toy'],
+    'Gifts & Donations': ['gift', 'charity', 'donation', 'present', 'shagun'],
+    'Other': ['miscellaneous']
 }
 
 def get_category_from_keywords(text):
@@ -71,6 +76,32 @@ def get_category_from_keywords(text):
     for category, keywords in CATEGORY_KEYWORDS.items():
         if any(keyword in text_lower for keyword in keywords):
             return category
+    return None
+
+def extract_date(text):
+    """Extracts date from text in various formats."""
+    # Matches: DD/MM/YYYY, DD-MM-YYYY, DD.MM.YYYY, YYYY-MM-DD
+    # Also: 12th Jan 2023, 12 January 2023
+    date_patterns = [
+        r'\b(\d{1,2})[-/.](\d{1,2})[-/.](\d{2,4})\b',  # DD/MM/YYYY
+        r'\b(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})\b',    # YYYY-MM-DD
+        r'\b(\d{1,2})(?:st|nd|rd|th)?\s+(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\s+(\d{2,4})\b' # 12 Jan 2023
+    ]
+    
+    for pattern in date_patterns:
+        match = re.search(pattern, text, re.IGNORECASE)
+        if match:
+            # Normalize to YYYY-MM-DD for consistency if needed, or just return the string
+            # For now, returning the raw matched string is fine, Frontend can parse it.
+            # But converting to standard format is better.
+            return match.group(0)
+            
+    # Keywords like "today", "yesterday"
+    if "yesterday" in text.lower():
+        return (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    if "today" in text.lower():
+        return datetime.now().strftime("%Y-%m-%d")
+        
     return None
 
 def extract_amount(text):
@@ -138,7 +169,8 @@ def extract_amount(text):
     for n in numbers:
         try:
             val = float(n.replace(',', ''))
-            if 1.0 < val < 500000: 
+            # Filter out likely dates (years 2020-2030) or small integers if they look like quantities
+            if 1.0 < val < 500000 and val not in range(2020, 2031): 
                 valid_amounts.append(val)
         except:
             continue
@@ -153,28 +185,56 @@ def extract_amount(text):
 
 def extract_item(text, amount):
     text_lower = text.lower()
+    
+    # Remove the amount from the text to avoid confusion
     if amount:
         amount_str = str(int(amount) if amount % 1 == 0 else amount)
         text_lower = text_lower.replace(amount_str, '')
+        
+    # Remove date-like patterns to avoid them becoming the item name
+    text_lower = re.sub(r'\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}', '', text_lower) 
+    
     text_no_numbers = re.sub(r'\d+\.?\d*', '', text_lower).strip()
-    stop_words = ['bought', 'paid', 'for', 'a', 'an', 'the', 'rs', 'inr', 'rupees', 'was', 'of', 'my', 'recharged', 'new', 'got', 'purchase', 'cost', 'bill', 'amount', 'at', 'costing', 'price', 'rate']
+    
+    # Aggressive stop words removal
+    stop_words = [
+        'bought', 'paid', 'spent', 'purchase', 'cost', 'bill', 'amount', 'price', 'rate', 'rupees', 'rs', 'inr',
+        'for', 'at', 'on', 'in', 'to', 'from', 'a', 'an', 'the', 'my', 'was', 'of', 'got', 'recharged', 'new', 'costing',
+        'total', 'money', 'cash', 'card', 'upi', 'payment', 'today', 'yesterday'
+    ]
+    
     querywords = text_no_numbers.split()
     resultwords  = [word for word in querywords if word.lower() not in stop_words]
+    
     item = ' '.join(resultwords).strip()
-    item = re.sub(r'\s+', ' ', item).title()
+    item = re.sub(r'\s+', ' ', item).title() # Clean extra spaces and title case
+    
     return item if item else "Unknown Item"
 
 def parse_receipt_text(text):
     lines = text.lower().split('\n')
     item = "Scanned Receipt"
     amount = extract_amount(text)
-    category = get_category_from_keywords(text) or 'Others'
+    date_str = extract_date(text)
+    category = get_category_from_keywords(text) or 'Other' # Default to optimized 'Other'
+    
+    # Try to find a better item name from the first meaningful line if not explicit
     for line in lines:
         if line.strip() and len(line.strip()) > 2:
             if not re.fullmatch(r'[\d\s.,-]+', line.strip()):
-                item = line.strip().title()
-                break
-    return {'item': item, 'amount': amount, 'category': category}
+                # Don't overwrite if we have a better heuristic later? 
+                # actually let's stick to the extract_item for better logic
+                pass 
+                
+    # Use the robust extract_item logic instead of just the first line
+    item = extract_item(text, amount)
+
+    return {
+        'item': item, 
+        'amount': amount, 
+        'category': category,
+        'date': date_str
+    }
 
 # --- 4. API ENDPOINTS ---
 
@@ -192,12 +252,21 @@ def process_text():
         predicted_category = get_category_from_keywords(input_text)
         if not predicted_category:
             print("-> No keyword match found. Using ML model for classification...")
-            predicted_category = str(category_classifier.predict([input_text])[0])
+            # ML model might return old categories, mapping them to new ones might be needed
+            # For now, trusting it or falling back to 'Other' via the dialog
+            try:
+                predicted_category = str(category_classifier.predict([input_text])[0])
+            except:
+                predicted_category = 'Other'
+                
         if predicted_category:
             print(f"-> Keyword match found! Category: {predicted_category}")
         
         amount = extract_amount(input_text)
         print(f"DEBUG: Extracted Amount: {amount}")
+        
+        date_str = extract_date(input_text)
+        print(f"DEBUG: Extracted Date: {date_str}")
         
         if amount is None:
             return jsonify({'error': 'Could not determine the amount from the text.'}), 400
@@ -207,7 +276,8 @@ def process_text():
         response = {
             'item': item,
             'amount': amount,
-            'category': predicted_category
+            'category': predicted_category,
+            'date': date_str
         }
         print(f"✅ Processed text successfully: {response}")
         return jsonify(response)
@@ -301,6 +371,32 @@ def process_pdf_receipt():
     except Exception as e:
         print(f"❌ An error occurred during PDF processing: {e}")
         return jsonify({'error': 'An internal error occurred while processing the PDF.'}), 500
+
+# --- FINANCIAL ANALYSIS ---
+from spending_analyzer import analyze_spending
+
+@app.route('/analyze-financials', methods=['POST'])
+def analyze_financials():
+    """Endpoint for predictive financial analysis."""
+    print("\n--- Request received at /analyze-financials endpoint! ---")
+    try:
+        data = request.get_json()
+        if not data or 'expenses' not in data:
+            return jsonify({'error': 'Invalid input. Please provide "expenses" list.'}), 400
+            
+        expenses = data['expenses']
+        income = data.get('income', 0.0) # Default to 0 if not provided
+        
+        print(f"Analyzing {len(expenses)} expenses with income: {income}...")
+        
+        result = analyze_spending(expenses, income)
+        
+        print(f"✅ Analysis complete: Forecast={result['forecast']}, Score={result['health_score']}")
+        return jsonify(result)
+        
+    except Exception as e:
+        print(f"❌ An error occurred in /analyze-financials: {e}")
+        return jsonify({'error': 'An internal server error occurred.'}), 500
 
 # --- 5. RUN THE APP ---
 if __name__ == '__main__':

@@ -187,4 +187,55 @@ class AiService {
       return null;
     }
   }
+
+  // --- NEW METHOD FOR FINANCIAL INSIGHTS ---
+  /// Sends expense history to backend for predictive analysis.
+  /// Returns a Map containing forecast, health score, alerts, and suggestions.
+  Future<Map<String, dynamic>?> getFinancialInsights(
+    List<dynamic> expenses,
+    double income,
+  ) async {
+    try {
+      // Convert list of Expense objects to list of Maps
+      final expenseList =
+          expenses.map((e) {
+            return {
+              'amount': e.amount,
+              'category': e.category,
+              'timestamp': e.timestamp.toDate().toIso8601String(),
+            };
+          }).toList();
+
+      final body = json.encode({'expenses': expenseList, 'income': income});
+
+      debugPrint("Requesting financial insights...");
+
+      final response = await http
+          .post(
+            Uri.parse('$_baseUrl/analyze-financials'),
+            headers: {'Content-Type': 'application/json; charset=UTF-8'},
+            body: body,
+          )
+          .timeout(const Duration(seconds: 15));
+
+      if (response.statusCode == 200) {
+        debugPrint("Insights received: ${response.body}");
+        return json.decode(response.body);
+      } else {
+        debugPrint(
+          "Failed to get insights. Status: ${response.statusCode}, Body: ${response.body}",
+        );
+        return null;
+      }
+    } on TimeoutException {
+      debugPrint('Error: Insights request timed out.');
+      return null;
+    } on http.ClientException catch (e) {
+      debugPrint('Error connecting to AI service for insights: $e');
+      return null;
+    } catch (e) {
+      debugPrint("Unexpected error getting insights: $e");
+      return null;
+    }
+  }
 }

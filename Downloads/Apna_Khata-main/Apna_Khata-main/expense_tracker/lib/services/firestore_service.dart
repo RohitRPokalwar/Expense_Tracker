@@ -8,6 +8,8 @@ class FirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
+  User? get currentUser => _auth.currentUser;
+
   // --- CORRECTED METHOD ---
   /// Gets a real-time stream of the current user's expenses.
   /// It safely handles the user being logged in or out.
@@ -24,20 +26,29 @@ class FirestoreService {
             .collection('expenses')
             .orderBy('timestamp', descending: true)
             .snapshots()
-            .map((snapshot) =>
-                snapshot.docs.map((doc) => Expense.fromFirestore(doc)).toList());
+            .map(
+              (snapshot) =>
+                  snapshot.docs
+                      .map((doc) => Expense.fromFirestore(doc))
+                      .toList(),
+            );
       }
     });
   }
 
-  Future<void> addExpense(String item, double amount, String category) async {
+  Future<void> addExpense(
+    String item,
+    double amount,
+    String category, {
+    DateTime? date,
+  }) async {
     final user = _auth.currentUser;
     if (user == null) return;
     await _db.collection('users').doc(user.uid).collection('expenses').add({
       'item': item,
       'amount': amount,
       'category': category,
-      'timestamp': Timestamp.now(),
+      'timestamp': date != null ? Timestamp.fromDate(date) : Timestamp.now(),
     });
   }
 
@@ -64,6 +75,7 @@ class FirestoreService {
         'photoURL': user.photoURL,
         'phoneNumber': null,
         'dateOfBirth': null,
+        'monthlyBudget': 0.0, // Default to 0
       });
     }
   }
